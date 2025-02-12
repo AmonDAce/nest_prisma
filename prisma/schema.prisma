@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Author {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String   @unique 
+  bio       String?
+  cpf       String
+  pais      String?  @db.Char(2)
+  createdAt DateTime @default(now()) @map("created_at")
+  profile   Profile?
+  posts     Post[]
+
+  @@map("authors")
+}
+
+model Profile {
+  id          String @id @default(uuid())
+  description String
+  author      Author @relation(fields: [authorId], references: [id])
+  authorId    Int    @unique @map("author_id")
+
+  @@map("profiles")  
+}
+
+model Post {
+  id             String         @id @default(uuid())  
+  title          String
+  content        String
+  createdAt      DateTime       @default(now()) @db.Timestamptz()
+  author         Author         @relation(fields: [authorId], references: [id])
+  authorId       Int            @unique @map("author_id")
+  postCategories PostCategory[]
+
+  @@map("posts")
+}
+
+model Category {
+  id             String             @id @default(uuid())
+  name           String
+  postCategories PostCategory[]
+
+  @@map("categories")
+}
+
+model PostCategory {
+  post    Post   @relation(fields: [postId], references: [id])
+  postId  String @map("post_id")
+
+  category    Category @relation(fields: [categoryId], references: [id])
+  categoryId  String   @map("category_id")
+
+  @@id([postId, categoryId])
+  @@map("post_categories")
+}
