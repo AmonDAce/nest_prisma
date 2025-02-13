@@ -7,5 +7,6 @@ import { AuthorService } from './author.service';
     imports: [PrismaDatabaseModule],
     providers: [AuthorService],
     controllers: [AuthorController],
+    exports: [AuthorService],
 })
 export class AuthorModule {}

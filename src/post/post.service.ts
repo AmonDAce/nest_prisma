@@ -6,40 +6,67 @@ import { PrismaService } from 'src/prisma-database/prisma.service';
 export class PostService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(post: CreatePostDto, authorId: number) {
-    if (!authorId) {
-      throw new NotFoundException('Autor não encontrado');
-    }
+  async create(post: CreatePostDto) {
 
-    if (post.postCategory) {
-      const categoriesExists = await this.prismaService.category.findMany({
-        where: {
-          name: {
-            in: post.postCategory,
-          },
-        },
-      });
-      if (categoriesExists.length !== post.postCategory.length) {
-        throw new NotFoundException('Categoria não encontrada');
-      }
+  const author = await this.prismaService.author.findUnique({
+    where: {
+      id: post.authorId,
     }
-    return await this.prismaService.post.create({
-      data: {
-        title: post.title,
-        content: post.content,
-        author: {
-          connect: { id: authorId },
-        },
-        postCategories: post.postCategory
-          ? {
-              create: post.postCategory.map((category) => ({
-                categoryId: category,
-              })),
-            }
-          : undefined,
-      },
-    });
+  });
+
+  if (!author) {
+    throw new NotFoundException('Autor não encontrado');
   }
+
+  console.log(author);
+
+
+  return await this.prismaService.post.create({
+    data: {
+      title: post.title,
+      content: post.content,
+      authorId: author.id,
+    }
+  });
+}
+    
+
+  //   const authorExists = await this.prismaService.author.findUnique({
+  //     where: { id: this.prismaService.author.id },
+  //   });
+  //   if (!authorExists) {
+  //     throw new NotFoundException('Autor não encontrado');
+  //   }
+
+  //   if (post.Categories) {
+  //     const categoriesExists = await this.prismaService.category.findMany({
+  //       where: {
+  //         name: {
+  //           in: post.Categories,
+  //         },
+  //       },
+  //     });
+  //     if (categoriesExists.length !== post.Categories.length) {
+  //       throw new NotFoundException('Categoria não encontrada');
+  //     }
+  //   }
+  //   return await this.prismaService.post.create({
+  //     data: {
+  //       title: post.title,
+  //       content: post.content,
+  //       author: {
+  //         connect: { id: post.authorId },
+  //       },
+  //       postCategories: post.Categories
+  //         ? {
+  //             create: post.Categories.map((category) => ({
+  //               categoryId: category,
+  //             })),
+  //           }
+  //         : undefined,
+  //     },
+  //   });
+  // }
 
   async findManyPost() {
     return await this.prismaService.post.findMany({

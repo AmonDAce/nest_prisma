@@ -5,7 +5,7 @@ CREATE TABLE "authors" (
     "email" TEXT NOT NULL,
     "bio" TEXT,
     "cpf" TEXT NOT NULL,
-    "pais" CHAR(2) NOT NULL,
+    "pais" CHAR(2),
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "authors_pkey" PRIMARY KEY ("id")
@@ -13,7 +13,7 @@ CREATE TABLE "authors" (
 
 -- CreateTable
 CREATE TABLE "profiles" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "author_id" INTEGER NOT NULL,
 
@@ -48,10 +48,16 @@ CREATE TABLE "post_categories" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "authors_email_key" ON "authors"("email");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "profiles_author_id_key" ON "profiles"("author_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "posts_author_id_key" ON "posts"("author_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "categories_name_key" ON "categories"("name");
 
 -- AddForeignKey
 ALTER TABLE "profiles" ADD CONSTRAINT "profiles_author_id_fkey" FOREIGN KEY ("author_id") REFERENCES "authors"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

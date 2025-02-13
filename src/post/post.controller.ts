@@ -6,12 +6,13 @@ import { CreatePostDto } from './dto/create-post.dto';
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
-  @Post(':id')
+  @Post()
   @HttpCode(201)
-  async create(@Body() createPostDto: CreatePostDto, authorId: number) {
+  async create(@Body() createPostDto: CreatePostDto) {
+
+    console.log('authorId', createPostDto.authorId);
     
-    const Id = authorId;
-    return await this.postService.create(createPostDto, Id);
+    return await this.postService.create(createPostDto);
   }
 
   @Get()
