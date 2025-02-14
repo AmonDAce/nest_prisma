@@ -1,5 +1,4 @@
-import { Injectable } from '@nestjs/common';
-import { profile } from 'console';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma-database/prisma.service';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { UpdateAuthorDto } from './dto/update-author.dto';
@@ -34,9 +33,44 @@ export class AuthorService {
     }
 
     async createAuthor(author: CreateAuthorDto) {
+
+        const profile = !author.profileDescription ? undefined : {
+            description: author.profileDescription
+        };
+
         return await this.prismaService.author.create({
-            data: author
+            data: { 
+                ...author,
+                profile: {
+                    create: profile
+                }}
         });
+    }
+
+    async createProfile (id: number, profileDescription: string) {
+        
+        const author = await this.prismaService.author.findUnique({
+            where: {
+                id: Number(id)
+            }
+        });
+
+        if (!author) {
+            throw new NotFoundException('Autor não encontrado');
+        }
+
+        const profile = await this.prismaService.profile.create({
+            data: {
+                description: profileDescription,
+                author: {
+                    connect: {
+                        id: author.id
+                    }
+                }
+            }
+        })
+
+        return profile;
     }
 
     async updateAuthor(id: number, author: UpdateAuthorDto) {

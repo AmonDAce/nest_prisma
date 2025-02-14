@@ -4,71 +4,55 @@ import { PrismaService } from 'src/prisma-database/prisma.service';
 
 @Injectable()
 export class PostService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+  ) {}
 
-  async create(post: CreatePostDto) {
+  async createPost(post: CreatePostDto) {
 
-  const author = await this.prismaService.author.findUnique({
-    where: {
-      id: post.authorId,
+    const authorExists = await this.prismaService.author.findUnique({
+      where: {
+        id: Number(post.authorId)
+      }
+    })
+
+    if (!authorExists) {
+      throw new NotFoundException('Autor não encontrado');
     }
-  });
 
-  if (!author) {
-    throw new NotFoundException('Autor não encontrado');
+    const categoriesExists = await this.prismaService.category.findMany({
+      where: {
+        id: { in: post.categories }
+      }
+    })
+
+    if (post.categories.length !== categoriesExists.length) {
+      throw new NotFoundException('Categorias não encontrada');
+    }
+
+    const criarPost = await this.prismaService.post.create({
+      data: {
+        title: post.title,
+        content: post.content,
+        authorId: authorExists.id,
+        postCategories: {
+          create: categoriesExists.map(category => {
+            return {
+              categoryId: category.id
+            }
+          })
+        }
+      }
+    })
+
+    return await this.prismaService.post.create({
+      data: { 
+        ...criarPost,
+      },
+    });
   }
 
-  console.log(author);
-
-
-  return await this.prismaService.post.create({
-    data: {
-      title: post.title,
-      content: post.content,
-      authorId: author.id,
-    }
-  });
-}
-    
-
-  //   const authorExists = await this.prismaService.author.findUnique({
-  //     where: { id: this.prismaService.author.id },
-  //   });
-  //   if (!authorExists) {
-  //     throw new NotFoundException('Autor não encontrado');
-  //   }
-
-  //   if (post.Categories) {
-  //     const categoriesExists = await this.prismaService.category.findMany({
-  //       where: {
-  //         name: {
-  //           in: post.Categories,
-  //         },
-  //       },
-  //     });
-  //     if (categoriesExists.length !== post.Categories.length) {
-  //       throw new NotFoundException('Categoria não encontrada');
-  //     }
-  //   }
-  //   return await this.prismaService.post.create({
-  //     data: {
-  //       title: post.title,
-  //       content: post.content,
-  //       author: {
-  //         connect: { id: post.authorId },
-  //       },
-  //       postCategories: post.Categories
-  //         ? {
-  //             create: post.Categories.map((category) => ({
-  //               categoryId: category,
-  //             })),
-  //           }
-  //         : undefined,
-  //     },
-  //   });
-  // }
-
-  async findManyPost() {
+  async findManyPostFromAuthor() {
     return await this.prismaService.post.findMany({
       include: {
         postCategories: {

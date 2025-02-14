@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { PrismaService } from 'src/prisma-database/prisma.service';
-import { UUID } from 'crypto';
 
 @Injectable()
 export class CategoryService {
