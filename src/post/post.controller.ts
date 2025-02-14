@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, HttpCode, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, HttpCode, Param, Delete, NotFoundException } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { connect } from 'http2';
@@ -11,8 +11,6 @@ export class PostController {
   @HttpCode(201)
   async create(@Body() createPostDto: CreatePostDto) {
 
-    console.log(createPostDto);
-
     return await this.postService.createPost(createPostDto);
   }
 
@@ -20,4 +18,10 @@ export class PostController {
   async findAll() {
     return await this.postService.findManyPostFromAuthor();
   }
+
+  @Delete(':id')
+    async delete(@Param('id') id: string) {
+
+      return this.postService.deletePost(id);
+    }
 }

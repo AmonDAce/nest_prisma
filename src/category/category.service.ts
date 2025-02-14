@@ -41,6 +41,6 @@ export class CategoryService {
       where: {
           id,
       },
-  });
+    });
   }
 }

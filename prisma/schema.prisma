@@ -42,7 +42,7 @@ model Post {
   content        String
   createdAt      DateTime       @default(now()) @db.Timestamptz()
   author         Author         @relation(fields: [authorId], references: [id])
-  authorId       Int            @unique @map("author_id")
+  authorId       Int            @map("author_id")
   postCategories PostCategory[]
 
   @@map("posts")
