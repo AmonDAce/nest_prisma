@@ -34,7 +34,6 @@ export class PostService {
       throw new NotFoundException('Uma ou mais categorias não foram encontradas');
     }
 
-    console.log("AUTOR", authorExists.id);
     const criarPost = await this.prismaService.post.create({
       data: {
         title: post.title,
@@ -51,7 +50,8 @@ export class PostService {
             }
           })
         }
-      }, include: {
+      }, 
+      include: {
         author: true,
       }
     })

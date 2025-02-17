@@ -19,14 +19,6 @@ export class AuthorController {
         return await this.authorService.createAuthor(author);
     }
 
-    @Post(':id')
-    @HttpCode(201)
-    async createProfile(@Param('id') id: number, @Body() profileDescription: string) {
-        console.log(id, profileDescription);
-        
-        return await this.authorService.createProfile(id, profileDescription);
-    }
-
     @Get()
     @HttpCode(200)
     async findAll() {

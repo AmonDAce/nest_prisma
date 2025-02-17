@@ -1,11 +1,12 @@
-import { Controller, Get, Post, Body, HttpCode, Param, Delete, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, HttpCode, Param, Delete } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
-import { connect } from 'http2';
 
 @Controller('post')
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(
+    private readonly postService: PostService
+  ) {}
 
   @Post()
   @HttpCode(201)

@@ -4,4 +4,5 @@ export class UpdateAuthorDto {
     bio?: string;
     cpf?: string;
     pais?: string;
+    profileDescription?: string;
 }
